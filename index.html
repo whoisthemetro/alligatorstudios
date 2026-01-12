@@ -115,6 +115,14 @@
             color: #aaa;
         }
 
+        .donation-message {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
         audio {
             width: 100%;
             margin-bottom: 20px;
@@ -170,6 +178,9 @@
             cursor: pointer;
             font-size: 13px;
             transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .playlist-item:hover {
@@ -180,12 +191,32 @@
             background-color: #333;
             font-weight: bold;
         }
+
+        .buy-btn {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .buy-btn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
     <div class="player">
         <img id="albumArt" class="album-art" alt="Sir Alligator Studios">
         
+        <div class="donation-message">
+            We're trying to reach a goal of $100,000 to bail out Sir Alligator and Monkey Town. Every song you buy goes towards their release!
+        </div>
+
         <div class="track-info">
             <div class="track-title" id="trackTitle">Track Title</div>
             <div class="track-artist" id="trackArtist">Sir Alligator Studios</div>
@@ -281,13 +312,38 @@
             playlist.forEach((track, index) => {
                 const item = document.createElement("div");
                 item.className = "playlist-item" + (index === currentTrack ? " active" : "");
-                item.textContent = track.title;
-                item.onclick = () => {
+                
+                const trackName = document.createElement("span");
+                trackName.textContent = track.title;
+                trackName.style.flex = "1";
+                trackName.style.cursor = "pointer";
+                trackName.onclick = () => {
                     loadTrack(index);
                     audio.play();
                 };
+                
+                const buyBtn = document.createElement("button");
+                buyBtn.className = "buy-btn";
+                buyBtn.textContent = "Buy";
+                buyBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    buyTrack(track.title);
+                };
+                
+                item.appendChild(trackName);
+                item.appendChild(buyBtn);
                 playlistDiv.appendChild(item);
             });
+        }
+
+        function buyTrack(trackTitle) {
+            const paypalEmail = "iamfartgod@gmail.com";
+            const amount = "1.00";
+            const itemName = `Sir Alligator Studios - ${trackTitle}`;
+            
+            const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${paypalEmail}&item_name=${encodeURIComponent(itemName)}&amount=${amount}&currency_code=USD`;
+            
+            window.open(paypalUrl, '_blank');
         }
 
         function nextTrack() {
