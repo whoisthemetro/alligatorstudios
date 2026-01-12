@@ -32,6 +32,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.75);
             z-index: 0;
+            pointer-events: none;
         }
 
         .background-video {
@@ -44,6 +45,15 @@
             z-index: -2;
             opacity: 0.5;
             pointer-events: none;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .player {
@@ -100,6 +110,14 @@
             }
         }
 
+        .donation-message {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
         .track-info {
             margin-bottom: 20px;
         }
@@ -113,14 +131,6 @@
         .track-artist {
             font-size: 14px;
             color: #aaa;
-        }
-
-        .donation-message {
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 20px;
-            line-height: 1.6;
         }
 
         audio {
@@ -192,8 +202,8 @@
             font-weight: bold;
         }
 
-        .buy-btn {
-            background-color: #28a745;
+        .donate-btn {
+            background-color: #ff6b35;
             color: #fff;
             border: none;
             padding: 6px 12px;
@@ -204,37 +214,178 @@
             transition: background-color 0.3s;
         }
 
-        .buy-btn:hover {
-            background-color: #218838;
+        .donate-btn:hover {
+            background-color: #ff5722;
+        }
+
+        .cart-panel {
+            background-color: #000;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 350px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+
+        .cart-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ff6b35;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .cart-item {
+            padding: 10px;
+            background-color: #111;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .remove-btn {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background-color 0.3s;
+        }
+
+        .remove-btn:hover {
+            background-color: #777;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        .cart-total {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #111;
+            border-radius: 5px;
+            text-align: center;
+            color: #ff6b35;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #111;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .email-input::placeholder {
+            color: #666;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background-color: #ff6b35;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-btn:hover:not(:disabled) {
+            background-color: #ff5722;
+        }
+
+        .checkout-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .player, .cart-panel {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="player">
-        <img id="albumArt" class="album-art" alt="Sir Alligator Studios">
-        
-        <div class="donation-message">
-            We're trying to reach a goal of $100,000 to bail out Sir Alligator and Monkey Town. Every song you buy goes towards their release!
-        </div>
-
-        <div class="track-info">
-            <div class="track-title" id="trackTitle">Track Title</div>
-            <div class="track-artist" id="trackArtist">Sir Alligator Studios</div>
-        </div>
-
-        <audio id="audioPlayer" controls></audio>
-
-        <div class="controls">
-            <button onclick="previousTrack()">← Previous</button>
-            <button onclick="nextTrack()">Next →</button>
-        </div>
-
-        <div class="playlist" id="playlist">        </div>
-    </div>
-
     <video class="background-video" muted autoplay loop>
         <source src="https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/glif-kling-2-6-pro-ai-video-generation-whoisthemetro-dlpv3jb1euti3zuh654weakz.mp4" type="video/mp4">
     </video>
+
+    <div class="container">
+        <div class="player">
+            <img id="albumArt" class="album-art" alt="Sir Alligator Studios">
+            
+            <div class="donation-message">
+                We're trying to reach a goal of $100,000 to bail out Sir Alligator and Monkey Town. Every penny goes towards our release!
+            </div>
+
+            <div class="track-info">
+                <div class="track-title" id="trackTitle">Track Title</div>
+                <div class="track-artist" id="trackArtist">Sir Alligator Studios</div>
+            </div>
+
+            <audio id="audioPlayer" controls></audio>
+
+            <div class="controls">
+                <button onclick="previousTrack()">← Previous</button>
+                <button onclick="nextTrack()">Next →</button>
+            </div>
+
+            <div class="playlist" id="playlist"></div>
+        </div>
+
+        <div class="cart-panel">
+            <div class="cart-header">🛒 Your Cart</div>
+            
+            <div class="cart-items" id="cartItems">
+                <div class="empty-cart">Cart is empty</div>
+            </div>
+
+            <div class="cart-total" id="cartTotal">Total: $0.00</div>
+
+            <input type="email" class="email-input" id="emailInput" placeholder="Enter your email for downloads" required>
+
+            <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>
+                Proceed to Donation
+            </button>
+        </div>
+    </div>
 
     <script>
         const albumImages = [
@@ -244,6 +395,8 @@
         ];
 
         let currentImageIndex = 0;
+        let currentTrack = 0;
+        let cart = [];
 
         const playlist = [
             { title: "99 Takes", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/99%20Takes.mp3" },
@@ -279,12 +432,15 @@
             { title: "When You're Not Here", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/When%20You're%20Not%20Here.mp3" }
         ];
 
-        let currentTrack = 0;
         const audio = document.getElementById("audioPlayer");
         const trackTitle = document.getElementById("trackTitle");
         const trackArtist = document.getElementById("trackArtist");
         const albumArt = document.getElementById("albumArt");
         const playlistDiv = document.getElementById("playlist");
+        const cartItemsDiv = document.getElementById("cartItems");
+        const cartTotalDiv = document.getElementById("cartTotal");
+        const emailInput = document.getElementById("emailInput");
+        const checkoutBtn = document.getElementById("checkoutBtn");
 
         function cycleAlbumArt() {
             albumArt.classList.add("transitioning");
@@ -294,8 +450,6 @@
                 albumArt.classList.remove("transitioning");
             }, 300);
         }
-
-        setInterval(cycleAlbumArt, 5000);
 
         function loadTrack(index) {
             currentTrack = index;
@@ -322,42 +476,84 @@
                     audio.play();
                 };
                 
-                const buyBtn = document.createElement("button");
-                buyBtn.className = "buy-btn";
-                buyBtn.textContent = "Buy";
-                buyBtn.onclick = (e) => {
+                const donateBtn = document.createElement("button");
+                donateBtn.className = "donate-btn";
+                donateBtn.textContent = "Donate";
+                donateBtn.onclick = (e) => {
                     e.stopPropagation();
-                    buyTrack(track.title);
+                    addToCart(track);
                 };
                 
                 item.appendChild(trackName);
-                item.appendChild(buyBtn);
+                item.appendChild(donateBtn);
                 playlistDiv.appendChild(item);
             });
         }
 
-        function buyTrack(trackTitle) {
-            const paypalEmail = "iamfartgod@gmail.com";
-            const amount = "1.00";
-            const itemName = `Sir Alligator Studios - ${trackTitle}`;
+        function addToCart(track) {
+            cart.push(track);
+            updateCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function updateCart() {
+            cartItemsDiv.innerHTML = "";
             
-            const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${paypalEmail}&item_name=${encodeURIComponent(itemName)}&amount=${amount}&currency_code=USD`;
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<div class="empty-cart">Cart is empty</div>';
+                cartTotalDiv.textContent = "Total: $0.00";
+                checkoutBtn.disabled = true;
+            } else {
+                cart.forEach((track, index) => {
+                    const cartItem = document.createElement("div");
+                    cartItem.className = "cart-item";
+                    
+                    const trackName = document.createElement("span");
+                    trackName.textContent = track.title;
+                    
+                    const removeBtn = document.createElement("button");
+                    removeBtn.className = "remove-btn";
+                    removeBtn.textContent = "Remove";
+                    removeBtn.onclick = () => removeFromCart(index);
+                    
+                    cartItem.appendChild(trackName);
+                    cartItem.appendChild(removeBtn);
+                    cartItemsDiv.appendChild(cartItem);
+                });
+                
+                const total = (cart.length * 1.00).toFixed(2);
+                cartTotalDiv.textContent = `Total: $${total}`;
+                checkoutBtn.disabled = !emailInput.value.trim();
+            }
+        }
+
+        function checkout() {
+            const email = emailInput.value.trim();
+            if (!email) {
+                alert("Please enter your email address");
+                return;
+            }
+
+            const total = (cart.length * 1.00).toFixed(2);
+            const trackNames = cart.map(t => t.title).join(", ");
+            const paypalEmail = "iamfartgod@gmail.com";
+            const itemName = `Sir Alligator Studios - Donation (${cart.length} tracks)`;
+            
+            const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${paypalEmail}&item_name=${encodeURIComponent(itemName)}&amount=${total}&currency_code=USD&custom=${encodeURIComponent(email)}`;
             
             window.open(paypalUrl, '_blank');
+            alert(`Thank you for your donation! A download link will be sent to ${email} after payment confirmation.`);
         }
 
-        function nextTrack() {
-            loadTrack((currentTrack + 1) % playlist.length);
-            audio.play();
-        }
+        emailInput.addEventListener('input', () => {
+            checkoutBtn.disabled = !emailInput.value.trim() || cart.length === 0;
+        });
 
-        function previousTrack() {
-            loadTrack((currentTrack - 1 + playlist.length) % playlist.length);
-            audio.play();
-        }
-
-        audio.addEventListener("ended", nextTrack);
-
+        setInterval(cycleAlbumArt, 5000);
         loadTrack(0);
     </script>
 </body>
