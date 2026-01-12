@@ -1,1 +1,297 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sir Alligator Studios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            background-image: url('https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/glif-chat-1768179958145.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: -1;
+        }
+
+        .player {
+            background-color: #000;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .album-art {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #111;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            object-fit: cover;
+            animation: fadeInOut 5s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 1; }
+            45%, 55% { opacity: 1; }
+        }
+
+        .album-art.transitioning {
+            animation: glitch 0.6s ease-in-out;
+        }
+
+        @keyframes glitch {
+            0% {
+                opacity: 1;
+                transform: translate(0);
+            }
+            25% {
+                opacity: 0.8;
+                transform: translate(-2px, 2px);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translate(2px, -2px);
+            }
+            75% {
+                opacity: 0.8;
+                transform: translate(-2px, -2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0);
+            }
+        }
+
+        .track-info {
+            margin-bottom: 20px;
+        }
+
+        .track-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .track-artist {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        audio {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        audio::-webkit-media-controls-panel {
+            background-color: #111;
+        }
+
+        audio::-webkit-media-controls-mute-button,
+        audio::-webkit-media-controls-play-button,
+        audio::-webkit-media-controls-volume-slider,
+        audio::-webkit-media-controls-current-time-display,
+        audio::-webkit-media-controls-time-remaining-display {
+            filter: invert(1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        .playlist {
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+
+        .playlist-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #111;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+
+        .playlist-item:hover {
+            background-color: #222;
+        }
+
+        .playlist-item.active {
+            background-color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="player">
+        <img id="albumArt" class="album-art" alt="Sir Alligator Studios">
+        
+        <div class="track-info">
+            <div class="track-title" id="trackTitle">Track Title</div>
+            <div class="track-artist" id="trackArtist">Sir Alligator Studios</div>
+        </div>
+
+        <audio id="audioPlayer" controls></audio>
+
+        <div class="controls">
+            <button onclick="previousTrack()">← Previous</button>
+            <button onclick="nextTrack()">Next →</button>
+        </div>
+
+        <div class="playlist" id="playlist"></div>
+    </div>
+
+    <script>
+        const albumImages = [
+            "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/glif-chat-1768170491020.png",
+            "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/glif-chat-1768178991508.png",
+            "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/glif-chat-1768179153839.png"
+        ];
+
+        let currentImageIndex = 0;
+
+        const playlist = [
+            { title: "99 Takes", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/99%20Takes.mp3" },
+            { title: "Abbey", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Abbey.mp3" },
+            { title: "Belong To You", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Belong%20To%20You.mp3" },
+            { title: "Beyond the Wood", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Beyond%20the%20Wood.mp3" },
+            { title: "Blueberry Funk", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Blueberry%20Funk.mp3" },
+            { title: "Chicken Face", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Chicken%20Face.mp3" },
+            { title: "Dark Mansion", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Dark%20Mansion.mp3" },
+            { title: "Desert Speed Run", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Desert%20Speed%20Run.mp3" },
+            { title: "Digital Disease", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Digital%20Disease.mp3" },
+            { title: "Dreaming in the Dark", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Dreaming%20in%20the%20Dark.mp3" },
+            { title: "Echoes in the Halls", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Echoes%20in%20the%20Halls.mp3" },
+            { title: "Endless Mile", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Endless%20Mile.mp3" },
+            { title: "Fast and Curious", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Fast%20and%20Curious.mp3" },
+            { title: "Fight to Breathe", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Fight%20to%20Breathe.mp3" },
+            { title: "Gone Like the Tide", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Gone%20Like%20the%20Tide.mp3" },
+            { title: "How Could I Be", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/How%20Could%20I%20Be.mp3" },
+            { title: "Interlude to My Life", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Interlude%20to%20My%20Life.mp3" },
+            { title: "LS-6", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/LS-6.mp3" },
+            { title: "Late Night Jam", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Late%20Night%20Jam.mp3" },
+            { title: "Minty", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Minty.mp3" },
+            { title: "Nobody Cares", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Nobody%20Cares.mp3" },
+            { title: "Ocean Water Blue", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Ocean%20Water%20Blue.mp3" },
+            { title: "Past Life", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Past%20Life.mp3" },
+            { title: "Pops 345", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Pops%20345.mp3" },
+            { title: "Satan Is Coming", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Satan%20Is%20Coming.mp3" },
+            { title: "Sax for Days", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Sax%20for%20Days.mp3" },
+            { title: "Session Tarist", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Session%20Tarist.mp3" },
+            { title: "Slow Dance With My Lady", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Slow%20Dance%20With%20My%20Lady.mp3" },
+            { title: "Sunbeam", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Sunbeam.mp3" },
+            { title: "Ultra", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Ultra.mp3" },
+            { title: "When You're Not Here", url: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/When%20You're%20Not%20Here.mp3" }
+        ];
+
+        let currentTrack = 0;
+        const audio = document.getElementById("audioPlayer");
+        const trackTitle = document.getElementById("trackTitle");
+        const trackArtist = document.getElementById("trackArtist");
+        const albumArt = document.getElementById("albumArt");
+        const playlistDiv = document.getElementById("playlist");
+
+        function cycleAlbumArt() {
+            albumArt.classList.add("transitioning");
+            setTimeout(() => {
+                currentImageIndex = (currentImageIndex + 1) % albumImages.length;
+                albumArt.src = albumImages[currentImageIndex];
+                albumArt.classList.remove("transitioning");
+            }, 300);
+        }
+
+        setInterval(cycleAlbumArt, 5000);
+
+        function loadTrack(index) {
+            currentTrack = index;
+            const track = playlist[index];
+            audio.src = track.url;
+            trackTitle.textContent = track.title;
+            trackArtist.textContent = "Sir Alligator Studios";
+            albumArt.src = albumImages[currentImageIndex];
+            updatePlaylistUI();
+        }
+
+        function updatePlaylistUI() {
+            playlistDiv.innerHTML = "";
+            playlist.forEach((track, index) => {
+                const item = document.createElement("div");
+                item.className = "playlist-item" + (index === currentTrack ? " active" : "");
+                item.textContent = track.title;
+                item.onclick = () => {
+                    loadTrack(index);
+                    audio.play();
+                };
+                playlistDiv.appendChild(item);
+            });
+        }
+
+        function nextTrack() {
+            loadTrack((currentTrack + 1) % playlist.length);
+            audio.play();
+        }
+
+        function previousTrack() {
+            loadTrack((currentTrack - 1 + playlist.length) % playlist.length);
+            audio.play();
+        }
+
+        audio.addEventListener("ended", nextTrack);
+
+        loadTrack(0);
+    </script>
+</body>
+</html>
