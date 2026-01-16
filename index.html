@@ -145,6 +145,7 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #444;
+            margin-bottom: 12px;
         }
 
         .progress-fill {
@@ -152,6 +153,53 @@
             background: linear-gradient(90deg, #ff6b35, #ff8c5a);
             width: 0%;
             transition: width 0.5s ease;
+        }
+
+        .donation-input-section {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .donation-amount-input {
+            flex: 1;
+            padding: 8px;
+            background-color: #000;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .donation-amount-input::placeholder {
+            color: #666;
+        }
+
+        .donation-amount-input::-webkit-outer-spin-button,
+        .donation-amount-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .donation-amount-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .paypal-donate-btn {
+            background-color: #ff6b35;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+
+        .paypal-donate-btn:hover {
+            background-color: #ff5722;
         }
 
         .track-info {
@@ -397,6 +445,10 @@
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
+                <div class="donation-input-section">
+                    <input type="number" class="donation-amount-input" id="donationAmount" placeholder="Donation amount" min="0.01" step="0.01">
+                    <button class="paypal-donate-btn" onclick="donateToPaypal()">Donate</button>
+                </div>
             </div>
 
             <div class="track-info">
@@ -413,22 +465,6 @@
 
             <div class="playlist" id="playlist"></div>
         </div>
-
-        <div class="cart-panel">
-            <div class="cart-header">🛒 Your Cart</div>
-            
-            <div class="cart-items" id="cartItems">
-                <div class="empty-cart">Cart is empty</div>
-            </div>
-
-            <div class="cart-total" id="cartTotal">Total: $0.00</div>
-
-            <input type="email" class="email-input" id="emailInput" placeholder="Enter your email for downloads" required>
-
-            <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>
-                Proceed to Donation
-            </button>
-        </div>
     </div>
 
     <script>
@@ -443,37 +479,37 @@
         let cart = [];
 
         const playlist = [
-            { title: "99 Takes", downloadUrl: "https://www.dropbox.com/scl/fi/38dsb3m8lbfwyvdbbvd1x/99-Takes.mp3?rlkey=h5vmmaozqd1clrnmfl0iw11y2&st=6835ctje&dl=1" },
-            { title: "Abbey", downloadUrl: "https://www.dropbox.com/scl/fi/1j6gxs3h0wtky707msxe3/Abbey.mp3?rlkey=89g4avgtfxu2foud1tj15wb6w&st=46cdm9ce&dl=1" },
-            { title: "Belong To You", downloadUrl: "https://www.dropbox.com/scl/fi/jm5olxd2wruhbwjhk7blj/Belong-To-You.mp3?rlkey=2jqsl4qw4h1slkswml8sovlf0&st=r6l46rb1&dl=1" },
-            { title: "Beyond the Wood", downloadUrl: "https://www.dropbox.com/scl/fi/qvizf5qlg2s90vz3twwe6/Beyond-the-Wood.mp3?rlkey=n02w4nvaa1artj3me4bf3qzab&st=zg4yfp4y&dl=1" },
-            { title: "Blueberry Funk", downloadUrl: "https://www.dropbox.com/scl/fi/2eb51r3abudpowhsmtwdk/Blueberry-Funk.mp3?rlkey=ogmbzacaa7f3d5v14ms1daj1f&st=md48cpp2&dl=1" },
-            { title: "Chicken Face", downloadUrl: "https://www.dropbox.com/scl/fi/bn9un2t4a6xqjrra27jyf/Chicken-Face.mp3?rlkey=b27wnydtqfohsmhwcvqhau3c9&st=exjwxl60&dl=1" },
-            { title: "Dark Mansion", downloadUrl: "https://www.dropbox.com/scl/fi/lw6dsciq8ed58l3hqgtju/Dark-Mansion.mp3?rlkey=ep8532tfd6vfn4jhve8y9ajoi&st=p02iyxkp&dl=1" },
-            { title: "Desert Speed Run", downloadUrl: "https://www.dropbox.com/scl/fi/29ptyehg8lrvvft9r8jr0/Desert-Speed-Run.mp3?rlkey=vq25yu8q8t42apmbmt4wkdjmc&st=ud4mos3m&dl=1" },
-            { title: "Digital Disease", downloadUrl: "https://www.dropbox.com/scl/fi/mv3hh11l3scu15swklvzl/Digital-Disease.mp3?rlkey=49h47rb2xi5hjglna2tthrmux&st=zhc4qp4f&dl=1" },
-            { title: "Dreaming in the Dark", downloadUrl: "https://www.dropbox.com/scl/fi/0epmxda4efq54ivg41nzg/Dreaming-in-the-Dark.mp3?rlkey=3nlld2qnffnl6oaofrlhgx17x&st=j1uczkua&dl=1" },
-            { title: "Echoes in the Halls", downloadUrl: "https://www.dropbox.com/scl/fi/830lxjr9453f9su41i0hw/Echoes-in-the-Halls.mp3?rlkey=6ouygp0o7jse59bbeymki9ggg&st=o57us12h&dl=1" },
-            { title: "Endless Mile", downloadUrl: "https://www.dropbox.com/scl/fi/zsvy1lwnxaurm5d99gcla/Endless-Mile.mp3?rlkey=jrpmkkzcjsa39zy72ot8jenwz&st=k286wegd&dl=1" },
-            { title: "Fast and Curious", downloadUrl: "https://www.dropbox.com/scl/fi/70ad4m9tkdq8qadr9xk10/Fast-and-Curious.mp3?rlkey=2ifwz4w9xxfif9rdovi0nd55f&st=uxp1lhj2&dl=1" },
-            { title: "Fight to Breathe", downloadUrl: "https://www.dropbox.com/scl/fi/59zzg0ej6ngyoq4zo47a9/Fight-to-Breathe.mp3?rlkey=ykpss7fmrvr9n72l9dybjt6xl&st=bgh7k5eo&dl=1" },
-            { title: "Gone Like the Tide", downloadUrl: "https://www.dropbox.com/scl/fi/q7pcdwgprreskmuj0j2f9/Gone-Like-the-Tide.mp3?rlkey=yh32xiy653jgpf6onyveuz85m&st=fbla1qfo&dl=1" },
-            { title: "How Could I Be", downloadUrl: "https://www.dropbox.com/scl/fi/y7qzthldaj2w3et760qwz/How-Could-I-Be.mp3?rlkey=w2ow3oiirp6bp0rln51yaz9ld&st=u94do0l8&dl=1" },
-            { title: "Interlude to My Life", downloadUrl: "https://www.dropbox.com/scl/fi/ly18dhmn0ncqbh1i5yyr3/Interlude-to-My-Life.mp3?rlkey=f54azvrn5fitlo24n0e2jc36r&st=f5avwz6h&dl=1" },
-            { title: "LS-6", downloadUrl: "https://www.dropbox.com/scl/fi/bxoreeql675h8xcu7mz77/LS-6.mp3?rlkey=x0wfc6ez7ts4f0xf3ov8bhqzp&st=je4i0qns&dl=1" },
-            { title: "Late Night Jam", downloadUrl: "https://www.dropbox.com/scl/fi/eo7bm4proqcwku2pup1m6/Late-Night-Jam.mp3?rlkey=1dpvy0d16sb6w2wnzkm91kqj5&st=lstnxkfp&dl=1" },
-            { title: "Minty", downloadUrl: "https://www.dropbox.com/scl/fi/nta5zw2vypzwrgb49jqhm/Minty.mp3?rlkey=msl506ardb22612th466oac6l&st=vsa4a3vp&dl=1" },
-            { title: "Nobody Cares", downloadUrl: "https://www.dropbox.com/scl/fi/u3hligqnvy4r823351vje/Nobody-Cares.mp3?rlkey=h3t3rxdxf8kxdct5oc56v1ur6&st=t3zgrxbo&dl=1" },
-            { title: "Ocean Water Blue", downloadUrl: "https://www.dropbox.com/scl/fi/elg0o19wbw2wgvg1cwlqc/Ocean-Water-Blue.mp3?rlkey=xsumgqk4i3su79hggf3ke95au&st=vf47ko7v&dl=1" },
-            { title: "Past Life", downloadUrl: "https://www.dropbox.com/scl/fi/uc3fthepq3udn2z81fsyn/Past-Life.mp3?rlkey=xayksq92o16wzwp86rrq0s8ev&st=12dd03jr&dl=1" },
-            { title: "Pops 345", downloadUrl: "https://www.dropbox.com/scl/fi/xezg8iqii5nq0hggh9mni/Pops-345.mp3?rlkey=m83o8l8qdj3xsetv6ywlx44xe&st=zuq9g4z0&dl=1" },
-            { title: "Satan Is Coming", downloadUrl: "https://www.dropbox.com/scl/fi/vj2n0dfahjprlyfdmxt6z/Satan-Is-Coming.mp3?rlkey=kabae4cttxy0sny4lmx9wf2da&st=v1rjf004&dl=1" },
-            { title: "Sax for Days", downloadUrl: "https://www.dropbox.com/scl/fi/1kwxe0eq0b42qlcqtix81/Sax-for-Days.mp3?rlkey=yaiejwl85okks5gthvp3rit2e&st=pw0ug60y&dl=1" },
-            { title: "Session Tarist", downloadUrl: "https://www.dropbox.com/scl/fi/28feb5p5uz0cmm9rnja24/Session-Tarist.mp3?rlkey=iuzhc7duxqj23zu57uztx8vt2&st=gehtk45v&dl=1" },
-            { title: "Slow Dance With My Lady", downloadUrl: "https://www.dropbox.com/scl/fi/4qxpckf62icobs8549521/Slow-Dance-With-My-Lady.mp3?rlkey=6dly6tg7q8mecg5g0pb2gmboa&st=827pbmvl&dl=1" },
-            { title: "Sunbeam", downloadUrl: "https://www.dropbox.com/scl/fi/egj5cf69p2w4jmviph9n6/Sunbeam.mp3?rlkey=80gs1albfuh5cliu9s45mc55d&st=7rw7fywk&dl=1" },
-            { title: "Ultra", downloadUrl: "https://www.dropbox.com/scl/fi/400rb65lgav4lmfvloest/Ultra.mp3?rlkey=kbad5upz32jbi89r9a9regipu&st=m4k88ukq&dl=1" },
-            { title: "When You're Not Here", downloadUrl: "https://www.dropbox.com/scl/fi/yqug7nkdbydef3z324g9p/When-You-re-Not-Here.mp3?rlkey=dxl2zeo72zmoc254h8o6gwb4m&st=u28r9a6n&dl=1" }
+            { title: "99 Takes", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/99%20Takes.mp3" },
+            { title: "Abbey", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Abbey.mp3" },
+            { title: "Belong To You", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Belong%20To%20You.mp3" },
+            { title: "Beyond the Wood", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Beyond%20the%20Wood.mp3" },
+            { title: "Blueberry Funk", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Blueberry%20Funk.mp3" },
+            { title: "Chicken Face", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Chicken%20Face.mp3" },
+            { title: "Dark Mansion", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Dark%20Mansion.mp3" },
+            { title: "Desert Speed Run", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Desert%20Speed%20Run.mp3" },
+            { title: "Digital Disease", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Digital%20Disease.mp3" },
+            { title: "Dreaming in the Dark", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Dreaming%20in%20the%20Dark.mp3" },
+            { title: "Echoes in the Halls", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Echoes%20in%20the%20Halls.mp3" },
+            { title: "Endless Mile", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Endless%20Mile.mp3" },
+            { title: "Fast and Curious", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Fast%20and%20Curious.mp3" },
+            { title: "Fight to Breathe", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Fight%20to%20Breathe.mp3" },
+            { title: "Gone Like the Tide", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Gone%20Like%20the%20Tide.mp3" },
+            { title: "How Could I Be", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/How%20Could%20I%20Be.mp3" },
+            { title: "Interlude to My Life", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Interlude%20to%20My%20Life.mp3" },
+            { title: "LS-6", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/LS-6.mp3" },
+            { title: "Late Night Jam", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Late%20Night%20Jam.mp3" },
+            { title: "Minty", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Minty.mp3" },
+            { title: "Nobody Cares", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Nobody%20Cares.mp3" },
+            { title: "Ocean Water Blue", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Ocean%20Water%20Blue.mp3" },
+            { title: "Past Life", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Past%20Life.mp3" },
+            { title: "Pops 345", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Pops%20345.mp3" },
+            { title: "Satan Is Coming", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Satan%20Is%20Coming.mp3" },
+            { title: "Sax for Days", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Sax%20for%20Days.mp3" },
+            { title: "Session Tarist", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Session%20Tarist.mp3" },
+            { title: "Slow Dance With My Lady", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Slow%20Dance%20With%20My%20Lady.mp3" },
+            { title: "Sunbeam", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Sunbeam.mp3" },
+            { title: "Ultra", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/Ultra.mp3" },
+            { title: "When You're Not Here", downloadUrl: "https://raw.githubusercontent.com/whoisthemetro/alligatorstudios/main/When%20You're%20Not%20Here.mp3" }
         ];
 
         const audio = document.getElementById("audioPlayer");
@@ -481,18 +517,46 @@
         const trackArtist = document.getElementById("trackArtist");
         const albumArt = document.getElementById("albumArt");
         const playlistDiv = document.getElementById("playlist");
-        const cartItemsDiv = document.getElementById("cartItems");
-        const cartTotalDiv = document.getElementById("cartTotal");
-        const emailInput = document.getElementById("emailInput");
-        const checkoutBtn = document.getElementById("checkoutBtn");
 
         const GOAL_AMOUNT = 100000;
         let totalRaised = 0;
 
+        function loadTotalRaised() {
+            const saved = localStorage.getItem("totalRaised");
+            return saved ? parseFloat(saved) : 0;
+        }
+
+        function saveTotalRaised(amount) {
+            const current = loadTotalRaised();
+            const newTotal = current + amount;
+            localStorage.setItem("totalRaised", newTotal.toString());
+            updateGoalMeter();
+        }
+
         function updateGoalMeter() {
+            totalRaised = loadTotalRaised();
             const percentage = Math.min((totalRaised / GOAL_AMOUNT) * 100, 100);
             document.getElementById("progressFill").style.width = percentage + "%";
-            document.getElementById("goalAmount").textContent = "$" + totalRaised.toLocaleString() + " / $" + GOAL_AMOUNT.toLocaleString();
+            document.getElementById("goalAmount").textContent = "$" + totalRaised.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / $" + GOAL_AMOUNT.toLocaleString();
+        }
+
+        function donateToPaypal() {
+            const amount = parseFloat(document.getElementById("donationAmount").value);
+            if (isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid donation amount");
+                return;
+            }
+
+            saveTotalRaised(amount);
+
+            const paypalEmail = "iamfartgod@gmail.com";
+            const itemName = "Sir Alligator Studios - Bail Out Fund";
+            
+            const paypalUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=" + encodeURIComponent(paypalEmail) + "&item_name=" + encodeURIComponent(itemName) + "&amount=" + amount.toFixed(2) + "&currency_code=USD";
+            
+            window.open(paypalUrl, '_blank');
+            
+            document.getElementById("donationAmount").value = "";
         }
 
         function cycleAlbumArt() {
@@ -529,91 +593,14 @@
             playlist.forEach((track, index) => {
                 const item = document.createElement("div");
                 item.className = "playlist-item" + (index === currentTrack ? " active" : "");
-                
-                const trackName = document.createElement("span");
-                trackName.textContent = track.title;
-                trackName.style.flex = "1";
-                trackName.style.cursor = "pointer";
-                trackName.onclick = () => {
+                item.textContent = track.title;
+                item.onclick = () => {
                     loadTrack(index);
                     audio.play();
                 };
-                
-                const donateBtn = document.createElement("button");
-                donateBtn.className = "donate-btn";
-                donateBtn.textContent = "Donate";
-                donateBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    addToCart(track);
-                };
-                
-                item.appendChild(trackName);
-                item.appendChild(donateBtn);
                 playlistDiv.appendChild(item);
             });
         }
-
-        function addToCart(track) {
-            cart.push(track);
-            updateCart();
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCart();
-        }
-
-        function updateCart() {
-            cartItemsDiv.innerHTML = "";
-            
-            if (cart.length === 0) {
-                cartItemsDiv.innerHTML = '<div class="empty-cart">Cart is empty</div>';
-                cartTotalDiv.textContent = "Total: $0.00";
-                checkoutBtn.disabled = true;
-            } else {
-                cart.forEach((track, index) => {
-                    const cartItem = document.createElement("div");
-                    cartItem.className = "cart-item";
-                    
-                    const trackName = document.createElement("span");
-                    trackName.textContent = track.title;
-                    
-                    const removeBtn = document.createElement("button");
-                    removeBtn.className = "remove-btn";
-                    removeBtn.textContent = "Remove";
-                    removeBtn.onclick = () => removeFromCart(index);
-                    
-                    cartItem.appendChild(trackName);
-                    cartItem.appendChild(removeBtn);
-                    cartItemsDiv.appendChild(cartItem);
-                });
-                
-                const total = (cart.length * 1.00).toFixed(2);
-                cartTotalDiv.textContent = "Total: $" + total;
-                checkoutBtn.disabled = !emailInput.value.trim();
-            }
-        }
-
-        function checkout() {
-            const email = emailInput.value.trim();
-            if (!email) {
-                alert("Please enter your email address");
-                return;
-            }
-
-            const total = (cart.length * 1.00).toFixed(2);
-            const paypalEmail = "iamfartgod@gmail.com";
-            const itemName = "Sir Alligator Studios - Donation (" + cart.length + " tracks)";
-            
-            const paypalUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=" + encodeURIComponent(paypalEmail) + "&item_name=" + encodeURIComponent(itemName) + "&amount=" + total + "&currency_code=USD&custom=" + encodeURIComponent(email);
-            
-            window.open(paypalUrl, '_blank');
-            alert("Thank you for your donation! A download link will be sent to " + email + " after payment confirmation.");
-        }
-
-        emailInput.addEventListener('input', () => {
-            checkoutBtn.disabled = !emailInput.value.trim() || cart.length === 0;
-        });
 
         audio.addEventListener("ended", nextTrack);
 
